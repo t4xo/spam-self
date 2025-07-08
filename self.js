@@ -1,26 +1,35 @@
-const Discord = require('discord.js-selfbot-v13');
-const client = new Discord.Client({
-  checkNamespam: true,
-  checkSelfbot: true
-});
+const { Client } = require('discord.js-selfbot-v13');
 
-client.on('ready', () => {
-  console.log(`${client.user.tag} olarak giriş yapıldı.`);
+// Tokenler, sunucu ID ve kanal ID
+const tokens = [
+  'TOKEN_1',
+  'TOKEN_2',
+  // Daha fazla token ekleyebilirsiniz
+];
+const guildId = 'SUNUCU_ID'; // Mesajların gönderileceği sunucu ID
+const channelId = 'KANAL_ID'; // Mesajların gönderileceği tek kanal ID
+const messageContent = 'Mesaj içeriği buraya'; // Göndermek istediğiniz mesaj
+const delay = 500; // Yarım saniye (500 ms) bekleme süresi
 
-  // Burada spam başlar
-  const kanalId = 'KANAL_ID'; // Mesaj atılacak kanal ID’sini buraya gir
-  const mesaj = 'Xd'; // Spamlanacak mesaj
-  const interval = 3000; // Mesajlar arası süre (ms cinsinden) - örn: 3000ms = 3 saniye
+// Mesaj gönderme fonksiyonu
+async function sendMessage(token, guildId, channelId, message) {
+  const client = new Client({ checkUpdate: false });
 
-  const kanal = client.channels.cache.get(kanalId);
-  if (!kanal) {
-    console.log('Kanal bulunamadı.');
-    return;
-  }
-
-  setInterval(() => {
-    kanal.send(mesaj).catch(console.error);
-  }, interval);
-});
-
-client.login('tokeniniz');
+  client.on('ready', async () => {
+    console.log(`${client.user.tag} olarak giriş yapıldı!`);
+    try {
+      const guild = await client.guilds.fetch(guildId);
+      if (guild) {
+        const channel = await guild.channels.fetch(channelId);
+        if (channel) {
+          await channel.send(message);
+          console.log(`Mesaj gönderildi: ${channelId}`);
+        } else {
+          console.error(`Kanal bulunamadı: ${channelId}`);
+        }
+      } else {
+        console.error(`Sunucu bulunamadı: ${guildId}`);
+      }
+    } catch (error) {
+      console.error(`Hata oluştu: ${error.message}`);
+    } finally {
